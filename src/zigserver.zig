@@ -1,4 +1,5 @@
 const std = @import("std");
+pub const log = @import("log_override.zig");
 
 pub fn Server() type {
     return struct {
