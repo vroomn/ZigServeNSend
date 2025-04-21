@@ -1,5 +1,15 @@
 const std = @import("std");
 
-pub fn main() !void {
-    return error.TestError;
+pub fn Server() type {
+    return struct {
+        const Self = @This();
+
+        pub fn init() Self {
+            return .{};
+        }
+
+        pub fn listen(_: Self) !void {
+            return;
+        }
+    };
 }

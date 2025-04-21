@@ -1,19 +1,21 @@
 const std = @import("std");
 
 pub fn build(b: *std.Build) void {
+    // Build the module which is the primary thing
+    const zigserver = b.addModule("ZigServer", .{
+        .root_source_file = b.path("src/zigserver.zig"),
+    });
+
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const exe_mod = b.createModule(.{
-        .root_source_file = b.path("src/zigserver.zig"),
+    const exe = b.addExecutable(.{
+        .name = "ZigServer_Demo",
         .target = target,
         .optimize = optimize,
+        .root_source_file = b.path("demo/demo_1.zig"),
     });
-
-    const exe = b.addExecutable(.{
-        .name = "ZigServer",
-        .root_module = exe_mod,
-    });
+    exe.root_module.addImport("ZigServer", zigserver);
 
     b.installArtifact(exe);
 
