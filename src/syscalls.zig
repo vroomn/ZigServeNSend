@@ -1,15 +1,15 @@
-pub inline fn syscallOne(number: usize, arg1: anytype) usize {
+pub inline fn syscallOne(number: usize, arg1: anytype) c_int {
     return asm volatile ("syscall"
-        : [ret] "={rax}" (-> usize),
+        : [ret] "={rax}" (-> c_int),
         : [number] "{rax}" (number),
           [arg1] "{rdi}" (arg1),
         : "rcx", "r11"
     );
 }
 
-pub inline fn syscallTwo(number: usize, arg1: anytype, arg2: anytype) usize {
+pub inline fn syscallTwo(number: usize, arg1: anytype, arg2: anytype) c_int {
     return asm volatile ("syscall"
-        : [ret] "={rax}" (-> usize),
+        : [ret] "={rax}" (-> c_int),
         : [number] "{rax}" (number),
           [arg1] "{rdi}" (arg1),
           [arg2] "{rsi}" (arg2),
@@ -17,9 +17,9 @@ pub inline fn syscallTwo(number: usize, arg1: anytype, arg2: anytype) usize {
     );
 }
 
-pub inline fn syscallThree(number: usize, arg1: anytype, arg2: anytype, arg3: anytype) usize {
+pub inline fn syscallThree(number: usize, arg1: anytype, arg2: anytype, arg3: anytype) c_int {
     return asm volatile ("syscall"
-        : [ret] "={rax}" (-> usize),
+        : [ret] "={rax}" (-> c_int),
         : [number] "{rax}" (number),
           [arg1] "{rdi}" (arg1),
           [arg2] "{rsi}" (arg2),
@@ -28,9 +28,9 @@ pub inline fn syscallThree(number: usize, arg1: anytype, arg2: anytype, arg3: an
     );
 }
 
-pub inline fn syscallFour(number: usize, arg1: anytype, arg2: anytype, arg3: anytype, arg4: anytype) usize {
+pub inline fn syscallFour(number: usize, arg1: anytype, arg2: anytype, arg3: anytype, arg4: anytype) c_int {
     return asm volatile ("syscall"
-        : [ret] "={rax}" (-> usize),
+        : [ret] "={rax}" (-> c_int),
         : [number] "{rax}" (number),
           [arg1] "{rdi}" (arg1),
           [arg2] "{rsi}" (arg2),
@@ -40,9 +40,9 @@ pub inline fn syscallFour(number: usize, arg1: anytype, arg2: anytype, arg3: any
     );
 }
 
-pub inline fn syscallFive(number: usize, arg1: anytype, arg2: anytype, arg3: anytype, arg4: anytype, arg5: anytype) usize {
+pub inline fn syscallFive(number: usize, arg1: anytype, arg2: anytype, arg3: anytype, arg4: anytype, arg5: anytype) c_int {
     return asm volatile ("syscall"
-        : [ret] "={rax}" (-> usize),
+        : [ret] "={rax}" (-> c_int),
         : [number] "{rax}" (number),
           [arg1] "{rdi}" (arg1),
           [arg2] "{rsi}" (arg2),
@@ -53,9 +53,9 @@ pub inline fn syscallFive(number: usize, arg1: anytype, arg2: anytype, arg3: any
     );
 }
 
-pub inline fn syscallSix(number: usize, arg1: anytype, arg2: anytype, arg3: anytype, arg4: anytype, arg5: anytype, arg6: anytype) usize {
+pub inline fn syscallSix(number: usize, arg1: anytype, arg2: anytype, arg3: anytype, arg4: anytype, arg5: anytype, arg6: anytype) c_int {
     return asm volatile ("syscall"
-        : [ret] "={rax}" (-> usize),
+        : [ret] "={rax}" (-> c_int),
         : [number] "{rax}" (number),
           [arg1] "{rdi}" (arg1),
           [arg2] "{rsi}" (arg2),
