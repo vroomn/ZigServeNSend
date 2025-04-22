@@ -10,7 +10,7 @@ pub fn Server() type {
 
         pub fn init() Self {
             return .{
-                .router = router.Router().init(),
+                .router = router.Router().init(std.heap.page_allocator),
             };
         }
 

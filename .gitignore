@@ -1,2 +1,4 @@
 zig-out/
 .zig-cache/
+/test_bin
+/test_bin.o
