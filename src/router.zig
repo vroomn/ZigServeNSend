@@ -10,16 +10,6 @@ const HTTPMethod = enum(u16) {
     OPTIONS = 0x040,
     TRACE = 0x080,
     PATCH = 0x100,
-
-    // Put all the methods into one datatype represented by one bit
-    // Implemented in case there's ever a future need for multiple methods on one handler
-    pub fn join(opts: anytype) u16 {
-        var output: u16 = 0;
-        inline for (opts) |value| {
-            output |= @intFromEnum(value);
-        }
-        return output;
-    }
 };
 
 const MethodContainer = struct {
@@ -60,18 +50,18 @@ pub fn Router() type {
         _arena: std.heap.ArenaAllocator,
         _arenaAllocator: std.mem.Allocator,
 
-        //_pageEndpoints: std.ArrayList(Handler),
         _apiEndpoints: std.ArrayList(Handler),
+        _pages: std.ArrayList(Handler),
 
         // Allocator is expected to be a page allocator
         pub fn init(allocator: std.mem.Allocator) Self {
             var arena = std.heap.ArenaAllocator.init(allocator);
-            //var list = std.ArrayList(Handler).init(allocator);
 
             return .{
                 ._arena = arena,
                 ._arenaAllocator = arena.allocator(),
                 ._apiEndpoints = std.ArrayList(Handler).init(allocator),
+                ._pages = std.ArrayList(Handler).init(allocator),
             };
         }
 
@@ -80,36 +70,39 @@ pub fn Router() type {
             self._arena.deinit();
         }
 
-        // Intended for static content served to the client, overrides the default hander attached to content
-        pub fn attachHandler(_: Self, method: HTTPMethod, comptime path: []const u8, callback: fn () void) void {
-            _ = method;
-            _ = path;
-            _ = callback;
-            return;
-        }
-
-        // Intended for API endpoints, the path will be prepended with /api/
-        // Example URL: http://localhost:8080/api/foo_bar
-        pub fn addEndpoint(self: *Self, method: HTTPMethod, comptime path: []const u8, callback: fn () void) !void {
+        fn appendHandler(target: *std.ArrayList(Handler), method: HTTPMethod, comptime path: []const u8, callback: fn () void) !void {
             // First check for already existing entry and update that
-            for (self._apiEndpoints.items, 0..) |item, i| {
+            for (target.items, 0..) |item, i| {
                 if (std.mem.eql(u8, path, item.path)) {
-                    self._apiEndpoints.items[i].methods[@ctz(@intFromEnum(method))].callback = @constCast(&callback);
+                    target.items[i].methods[@ctz(@intFromEnum(method))].callback = @constCast(&callback);
                     return;
                 }
             }
 
             // If not, create new entry
-            try self._apiEndpoints.append(.{
+            target.append(.{
                 .path = path,
                 .methods = Handler.ContainerGen(method, @constCast(&callback)),
-            });
+            }) catch return error.EndpointAppend;
             return;
         }
 
+        // Intended for static content served to the client, overrides the default hander attached to content
+        pub fn attachToPage(self: *Self, method: HTTPMethod, comptime path: []const u8, callback: fn () void) void {
+            return appendHandler(&self._pages, method, path, callback);
+        }
+
+        // Intended for API endpoints, the path will be prepended with /api/
+        // Example URL: http://localhost:8080/api/foo_bar
+        pub fn addEndpoint(self: *Self, method: HTTPMethod, comptime path: []const u8, callback: fn () void) !void {
+            return appendHandler(&self._apiEndpoints, method, path, callback);
+        }
+
         pub fn composeTree(self: *Self) void {
+
+            // Free out all the ArrayList entries because it has no use now
             self._apiEndpoints.deinit();
-            // At some point after data is sorted and put into the hashmap, reset it all
+            self._pages.deinit();
 
             return;
         }
@@ -125,10 +118,7 @@ test "Full Router Test" {
     try router.addEndpoint(HTTPMethod.GET, "/", tmp);
     try router.addEndpoint(HTTPMethod.POST, "/", tmp);
 
-    for (router._apiEndpoints.items) |value| {
-        for (0..9) |i| {
-            std.debug.print("{any}\n", .{value.methods[i]});
-        }
-        @call(.auto, value.methods[0].callback.?, .{});
-    }
+    try router.attachToPage(HTTPMethod.GET, "/", tmp);
+
+    router.composeTree();
 }
