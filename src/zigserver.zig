@@ -2,6 +2,8 @@ const std = @import("std");
 pub const log = @import("log_override.zig");
 const router = @import("router.zig");
 
+pub const HTTPMethods: type = router.HTTPMethod;
+
 pub fn Server() type {
     return struct {
         const Self = @This();
@@ -14,7 +16,8 @@ pub fn Server() type {
             };
         }
 
-        pub fn listen(_: Self) !void {
+        pub fn listen(self: *Self) !void {
+            self.*.router.composeTree();
             return;
         }
     };

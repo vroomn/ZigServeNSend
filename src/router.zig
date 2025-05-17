@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const HTTPMethod = enum(u16) {
+pub const HTTPMethod = enum(u16) {
     GET = 0x001,
     POST = 0x002,
     HEAD = 0x004,
@@ -88,7 +88,7 @@ pub fn Router() type {
         }
 
         // Intended for static content served to the client, overrides the default hander attached to content
-        pub fn attachToPage(self: *Self, method: HTTPMethod, comptime path: []const u8, callback: fn () void) void {
+        pub fn attachToPage(self: *Self, method: HTTPMethod, comptime path: []const u8, callback: fn () void) !void {
             return appendHandler(&self._pages, method, path, callback);
         }
 
@@ -99,7 +99,6 @@ pub fn Router() type {
         }
 
         pub fn composeTree(self: *Self) void {
-
             // Free out all the ArrayList entries because it has no use now
             self._apiEndpoints.deinit();
             self._pages.deinit();

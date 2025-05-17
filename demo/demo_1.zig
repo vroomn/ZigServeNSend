@@ -6,8 +6,14 @@ pub const std_options: std.Options = .{
     .logFn = zigserver.log.override,
 };
 
+fn callback() void {
+    std.log.info("Debug", .{});
+}
+
 pub fn main() !void {
-    const server = zigserver.Server().init();
+    var server = zigserver.Server().init();
+
+    try server.router.addEndpoint(zigserver.HTTPMethods.GET, "/", callback);
 
     server.listen() catch |err| return err;
     return;
